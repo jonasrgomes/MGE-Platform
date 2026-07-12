@@ -1,6 +1,6 @@
 /**
  * @file ber_tag.h
- * @brief Tipos de tag BER básicos.
+ * @brief Tipos de tag BER utilizados pela MGE Platform.
  */
 
 #pragma once
@@ -42,22 +42,58 @@ struct Tag
         return static_cast<std::uint8_t>(
             static_cast<std::uint8_t>(tagClass) |
             static_cast<std::uint8_t>(pc) |
-            (isShortForm() ? static_cast<std::uint8_t>(number) : 0x1F));
+            (isShortForm()
+                ? static_cast<std::uint8_t>(number)
+                : 0x1F));
+    }
+
+    constexpr bool operator==(const Tag& other) const noexcept
+    {
+        return tagClass == other.tagClass &&
+               pc == other.pc &&
+               number == other.number;
+    }
+
+    constexpr bool operator!=(const Tag& other) const noexcept
+    {
+        return !(*this == other);
     }
 };
 
 namespace UniversalTag
 {
-constexpr Tag Boolean{TagClass::Universal, PcBit::Primitive, 1};
-constexpr Tag Integer{TagClass::Universal, PcBit::Primitive, 2};
-constexpr Tag BitString{TagClass::Universal, PcBit::Primitive, 3};
-constexpr Tag OctetString{TagClass::Universal, PcBit::Primitive, 4};
-constexpr Tag Null{TagClass::Universal, PcBit::Primitive, 5};
-constexpr Tag ObjectIdentifier{TagClass::Universal, PcBit::Primitive, 6};
-constexpr Tag Sequence{TagClass::Universal, PcBit::Constructed, 16};
-constexpr Tag Set{TagClass::Universal, PcBit::Constructed, 17};
-constexpr Tag Utf8String{TagClass::Universal, PcBit::Primitive, 12};
-constexpr Tag VisibleString{TagClass::Universal, PcBit::Primitive, 26};
+constexpr Tag Boolean{
+    TagClass::Universal, PcBit::Primitive, 1};
+
+constexpr Tag Integer{
+    TagClass::Universal, PcBit::Primitive, 2};
+
+constexpr Tag BitString{
+    TagClass::Universal, PcBit::Primitive, 3};
+
+constexpr Tag OctetString{
+    TagClass::Universal, PcBit::Primitive, 4};
+
+constexpr Tag Null{
+    TagClass::Universal, PcBit::Primitive, 5};
+
+constexpr Tag ObjectIdentifier{
+    TagClass::Universal, PcBit::Primitive, 6};
+
+constexpr Tag Enumerated{
+    TagClass::Universal, PcBit::Primitive, 10};
+
+constexpr Tag Utf8String{
+    TagClass::Universal, PcBit::Primitive, 12};
+
+constexpr Tag Sequence{
+    TagClass::Universal, PcBit::Constructed, 16};
+
+constexpr Tag Set{
+    TagClass::Universal, PcBit::Constructed, 17};
+
+constexpr Tag VisibleString{
+    TagClass::Universal, PcBit::Primitive, 26};
 }
 
 } // namespace ber

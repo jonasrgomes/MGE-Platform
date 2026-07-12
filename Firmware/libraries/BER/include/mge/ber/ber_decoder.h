@@ -1,9 +1,11 @@
 /**
  * @file ber_decoder.h
- * @brief Decoder BER base.
+ * @brief Decoder BER.
  */
 
 #pragma once
+
+#include <cstdint>
 
 #include "mge/ber/ber_length.h"
 #include "mge/ber/ber_tag.h"
@@ -33,7 +35,26 @@ public:
 
     core::Result readTlv(TlvView& tlv);
 
+    static core::Result decodeBoolean(
+        const TlvView& tlv,
+        bool& value);
+
+    static core::Result decodeInteger(
+        const TlvView& tlv,
+        std::int64_t& value);
+
+    static core::Result decodeEnumerated(
+        const TlvView& tlv,
+        std::int32_t& value);
+
+    static core::Result decodeNull(
+        const TlvView& tlv);
+
 private:
+    static core::Result decodeSignedIntegerValue(
+        const core::BufferView& bytes,
+        std::int64_t& value);
+
     core::BufferReader& m_reader;
 };
 

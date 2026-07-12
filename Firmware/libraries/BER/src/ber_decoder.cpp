@@ -1,5 +1,7 @@
 #include "mge/ber/ber_decoder.h"
 
+#include <limits>
+
 namespace mge
 {
 namespace ber
@@ -87,13 +89,128 @@ core::Result Decoder::readTlv(TlvView& tlv)
         return core::Error::BufferUnderflow;
     }
 
-    const core::byte* valueStart =
-        m_reader.currentData();
-
     tlv.value =
-        core::BufferView(valueStart, length);
+        core::BufferView(
+            m_reader.currentData(),
+            length);
 
     return m_reader.skip(length);
+}
+
+core::Result Decoder::decodeBoolean(
+    const TlvView& tlv,
+    bool& value)
+{
+    if (tlv.tag != UniversalTag::Boolean)
+    {
+        return core::Error::InvalidTag;
+    }
+
+    if (tlv.value.size() != 1)
+    {
+        return core::Error::InvalidLength;
+    }
+
+    value = tlv.value[0] != 0;
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeSignedIntegerValue(
+    const core::BufferView& bytes,
+    std::int64_t& value)
+{
+    if (bytes.data() == nullptr)
+    {
+        return core::Error::InvalidPointer;
+    }
+
+    if (bytes.size() == 0 || bytes.size() > 8)
+    {
+        return core::Error::InvalidLength;
+    }
+
+    std::uint64_t raw = 0;
+
+    for (core::usize i = 0; i < bytes.size(); ++i)
+    {
+        raw =
+            (raw << 8) |
+            static_cast<std::uint64_t>(bytes[i]);
+    }
+
+    if ((bytes[0] & 0x80U) != 0 &&
+        bytes.size() < 8)
+    {
+        const core::usize usedBits =
+            bytes.size() * 8;
+
+        raw |=
+            (~std::uint64_t{0}) << usedBits;
+    }
+
+    value = static_cast<std::int64_t>(raw);
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeInteger(
+    const TlvView& tlv,
+    std::int64_t& value)
+{
+    if (tlv.tag != UniversalTag::Integer)
+    {
+        return core::Error::InvalidTag;
+    }
+
+    return decodeSignedIntegerValue(
+        tlv.value,
+        value);
+}
+
+core::Result Decoder::decodeEnumerated(
+    const TlvView& tlv,
+    std::int32_t& value)
+{
+    if (tlv.tag != UniversalTag::Enumerated)
+    {
+        return core::Error::InvalidTag;
+    }
+
+    std::int64_t decoded = 0;
+
+    core::Result result =
+        decodeSignedIntegerValue(
+            tlv.value,
+            decoded);
+
+    if (result.failed())
+    {
+        return result;
+    }
+
+    if (decoded < std::numeric_limits<std::int32_t>::min() ||
+        decoded > std::numeric_limits<std::int32_t>::max())
+    {
+        return core::Error::InvalidValue;
+    }
+
+    value = static_cast<std::int32_t>(decoded);
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeNull(
+    const TlvView& tlv)
+{
+    if (tlv.tag != UniversalTag::Null)
+    {
+        return core::Error::InvalidTag;
+    }
+
+    if (!tlv.value.empty())
+    {
+        return core::Error::InvalidLength;
+    }
+
+    return core::Error::Ok;
 }
 
 } // namespace ber
