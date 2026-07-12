@@ -1,1 +1,3 @@
-# MGE-Platform
+# MGE Platform
+
+Framework industrial.
