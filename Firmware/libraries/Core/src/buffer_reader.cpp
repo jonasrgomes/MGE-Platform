@@ -47,6 +47,16 @@ usize BufferReader::size() const noexcept
     return m_buffer.size();
 }
 
+const byte* BufferReader::currentData() const noexcept
+{
+    if (m_buffer.data() == nullptr || m_position > m_buffer.size())
+    {
+        return nullptr;
+    }
+
+    return m_buffer.data() + m_position;
+}
+
 bool BufferReader::eof() const noexcept
 {
     return m_position >= m_buffer.size();

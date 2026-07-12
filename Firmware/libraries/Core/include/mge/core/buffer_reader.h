@@ -34,6 +34,8 @@ public:
 
     usize size() const noexcept;
 
+    const byte* currentData() const noexcept;
+
     bool eof() const noexcept;
 
     void rewind() noexcept;

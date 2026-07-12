@@ -35,6 +35,10 @@ enum class Error
 
     InvalidLength,
 
+    InvalidTag,
+
+    InvalidType,
+
     InvalidValue,
 
     InvalidAddress,

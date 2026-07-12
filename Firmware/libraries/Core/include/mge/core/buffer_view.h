@@ -69,6 +69,11 @@ public:
         return m_size;
     }
 
+    constexpr byte operator[](usize index) const noexcept
+    {
+        return (m_data != nullptr && index < m_size) ? m_data[index] : 0;
+    }
+
     /**
      * @brief Informa se a visão está vazia.
      */
