@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(MGE-BER VERSION 0.4.2 LANGUAGES CXX)
+project(MGE-BER VERSION 0.4.3 LANGUAGES CXX)
 add_library(mge-ber STATIC src/ber_length.cpp src/ber_encoder.cpp src/ber_decoder.cpp)
 target_include_directories(mge-ber PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(mge-ber PUBLIC mge-core)
@@ -10,3 +10,10 @@ add_test(NAME ber_foundation_test COMMAND ber_foundation_test)
 add_executable(ber_primitive_types_test tests/ber_primitive_types_test.cpp)
 target_link_libraries(ber_primitive_types_test PRIVATE mge-ber)
 add_test(NAME ber_primitive_types_test COMMAND ber_primitive_types_test)
+
+add_executable(ber_string_types_test tests/ber_string_types_test.cpp)
+target_link_libraries(ber_string_types_test PRIVATE mge-ber)
+add_test(NAME ber_string_types_test COMMAND ber_string_types_test)
+
+add_executable(ber_string_types_example examples/ber_string_types_example.cpp)
+target_link_libraries(ber_string_types_example PRIVATE mge-ber)

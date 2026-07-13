@@ -213,5 +213,65 @@ core::Result Decoder::decodeNull(
     return core::Error::Ok;
 }
 
+
+core::Result Decoder::decodeOctetString(const TlvView& tlv,
+                                        core::BufferView& value)
+{
+    if (tlv.tag != UniversalTag::OctetString)
+        return core::Error::InvalidTag;
+    value = tlv.value;
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeVisibleString(const TlvView& tlv,
+                                          core::BufferView& value)
+{
+    if (tlv.tag != UniversalTag::VisibleString)
+        return core::Error::InvalidTag;
+    value = tlv.value;
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeUtf8String(const TlvView& tlv,
+                                       core::BufferView& value)
+{
+    if (tlv.tag != UniversalTag::Utf8String)
+        return core::Error::InvalidTag;
+    value = tlv.value;
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeBitString(const TlvView& tlv,
+                                      BitStringView& value)
+{
+    if (tlv.tag != UniversalTag::BitString)
+        return core::Error::InvalidTag;
+
+    if (tlv.value.size() == 0)
+        return core::Error::InvalidLength;
+
+    const core::u8 unusedBits = tlv.value[0];
+    if (unusedBits > 7)
+        return core::Error::InvalidValue;
+
+    const core::usize dataBytes = tlv.value.size() - 1U;
+    if (dataBytes == 0 && unusedBits != 0)
+        return core::Error::InvalidValue;
+
+    const core::BufferView bytes = tlv.value.subview(1, dataBytes);
+
+    if (dataBytes != 0 && unusedBits != 0)
+    {
+        const core::u8 mask = static_cast<core::u8>((1U << unusedBits) - 1U);
+        if ((bytes[dataBytes - 1U] & mask) != 0)
+            return core::Error::InvalidValue;
+    }
+
+    value.bytes = bytes;
+    value.unusedBits = unusedBits;
+    value.bitCount = dataBytes * 8U - unusedBits;
+    return core::Error::Ok;
+}
+
 } // namespace ber
 } // namespace mge

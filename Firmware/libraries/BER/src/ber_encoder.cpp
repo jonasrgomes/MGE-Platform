@@ -162,5 +162,73 @@ core::Result Encoder::writeNull()
     return writeLength(0);
 }
 
+
+core::Result Encoder::writeOctetString(const void* data, core::usize length)
+{
+    if (data == nullptr && length != 0)
+        return core::Error::InvalidPointer;
+    return writeTlv(UniversalTag::OctetString, data, length);
+}
+
+core::Result Encoder::writeVisibleString(const char* text, core::usize length)
+{
+    if (text == nullptr && length != 0)
+        return core::Error::InvalidPointer;
+    return writeTlv(UniversalTag::VisibleString, text, length);
+}
+
+core::Result Encoder::writeVisibleString(const char* nullTerminatedText)
+{
+    if (nullTerminatedText == nullptr)
+        return core::Error::InvalidPointer;
+
+    core::usize length = 0;
+    while (nullTerminatedText[length] != '\0')
+        ++length;
+
+    return writeVisibleString(nullTerminatedText, length);
+}
+
+core::Result Encoder::writeUtf8String(const char* text, core::usize length)
+{
+    if (text == nullptr && length != 0)
+        return core::Error::InvalidPointer;
+    return writeTlv(UniversalTag::Utf8String, text, length);
+}
+
+core::Result Encoder::writeUtf8String(const char* nullTerminatedText)
+{
+    if (nullTerminatedText == nullptr)
+        return core::Error::InvalidPointer;
+
+    core::usize length = 0;
+    while (nullTerminatedText[length] != '\0')
+        ++length;
+
+    return writeUtf8String(nullTerminatedText, length);
+}
+
+core::Result Encoder::writeBitString(const void* data, core::usize bitCount)
+{
+    const core::usize byteCount = (bitCount + 7U) / 8U;
+
+    if (data == nullptr && byteCount != 0)
+        return core::Error::InvalidPointer;
+
+    const core::u8 unusedBits =
+        static_cast<core::u8>(byteCount == 0 ? 0 : (byteCount * 8U - bitCount));
+
+    core::Result result = writeTag(UniversalTag::BitString);
+    if (result.failed()) return result;
+
+    result = writeLength(byteCount + 1U);
+    if (result.failed()) return result;
+
+    result = m_writer.writeU8(unusedBits);
+    if (result.failed()) return result;
+
+    return m_writer.writeBytes(data, byteCount);
+}
+
 } // namespace ber
 } // namespace mge
