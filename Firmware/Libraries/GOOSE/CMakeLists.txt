@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-project(MGE-GOOSE VERSION 0.6.1.1 LANGUAGES CXX)
+project(MGE-GOOSE VERSION 0.6.1.2 LANGUAGES CXX)
 
 add_library(mge-goose STATIC
     src/goose_header.cpp
     src/goose_control_block.cpp
     src/goose_apdu_encoder.cpp
+    src/goose_apdu_decoder.cpp
 )
 
 target_include_directories(mge-goose PUBLIC
@@ -39,3 +40,10 @@ add_test(NAME goose_apdu_encoder_test COMMAND goose_apdu_encoder_test)
 
 add_executable(goose_apdu_encoder_example examples/goose_apdu_encoder_example.cpp)
 target_link_libraries(goose_apdu_encoder_example PRIVATE mge-goose)
+
+add_executable(goose_apdu_decoder_test tests/goose_apdu_decoder_test.cpp)
+target_link_libraries(goose_apdu_decoder_test PRIVATE mge-goose)
+add_test(NAME goose_apdu_decoder_test COMMAND goose_apdu_decoder_test)
+
+add_executable(goose_apdu_decoder_example examples/goose_apdu_decoder_example.cpp)
+target_link_libraries(goose_apdu_decoder_example PRIVATE mge-goose)
