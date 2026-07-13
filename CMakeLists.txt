@@ -9,3 +9,5 @@ add_subdirectory(Firmware/Libraries/Ethernet)
 add_subdirectory(Firmware/Libraries/BER)
 
 add_subdirectory(Firmware/Libraries/ASN1)
+
+add_subdirectory(Firmware/Libraries/GOOSE)

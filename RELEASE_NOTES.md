@@ -1,49 +1,47 @@
-# Sprint 005.1 — ASN.1 Foundation
+# Sprint 006.1A — GOOSE Foundation
 
 ## Implementado
 
-- `asn1::Type`
-- `asn1::Value`
-- `asn1::Encoder`
-- `asn1::Decoder`
-- NULL
-- BOOLEAN
-- INTEGER
-- OCTET STRING
-- VisibleString
-- UTF8String
-- BIT STRING
-- armazenamento zero-copy com `BufferView`
-- testes de ida e volta
-- exemplo
-- integração com CMake
+- constantes GOOSE;
+- `Timestamp` IEC 61850 de oito octetos;
+- cabeçalho GOOSE de 8 bytes;
+- `ControlBlock` com memória estática;
+- APPID;
+- MAC multicast;
+- VLAN ID e prioridade;
+- `timeAllowedToLive`;
+- `confRev`;
+- `gocbRef`, `datSet` e `goID`;
+- `Dataset<Capacity>` baseado no ASN.1 Dataset;
+- `Message<Capacity>`;
+- controle inicial de `stNum` e `sqNum`;
+- testes e exemplo;
+- integração ao CMake principal.
 
 ## Validação
 
-Projeto completo compilado em C++17.
+O projeto completo foi compilado em C++17.
 
 ```text
-10 de 10 testes aprovados
+12 de 12 testes aprovados
 0 falhas
 ```
+
+## Limite desta Sprint
+
+Esta entrega ainda não codifica a APDU GOOSE e não transmite pela Ethernet.
 
 ## Integração
 
 Extraia o ZIP na raiz do repositório e aceite a substituição do
-`CMakeLists.txt` principal.
+`CMakeLists.txt` principal e do módulo `Firmware/Libraries/GOOSE`.
 
 ## Commit sugerido
 
 ```text
-ASN1: adiciona foundation de tipos, Value, Encoder e Decoder
+GOOSE: adiciona foundation de Header, ControlBlock, Dataset e Message
 ```
 
-## Próxima Sprint
+## Próxima entrega
 
-Sprint 005.2:
-
-- coleção estática de valores;
-- dataset ASN.1;
-- limite configurável de entradas;
-- iteração sem alocação dinâmica;
-- base para o `allData` do GOOSE.
+Sprint 006.1B — GOOSE APDU Tags e Encoder Base.
