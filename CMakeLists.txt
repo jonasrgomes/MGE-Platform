@@ -7,3 +7,5 @@ enable_testing()
 add_subdirectory(Firmware/Libraries/Core)
 add_subdirectory(Firmware/Libraries/Ethernet)
 add_subdirectory(Firmware/Libraries/BER)
+
+add_subdirectory(Firmware/Libraries/ASN1)
