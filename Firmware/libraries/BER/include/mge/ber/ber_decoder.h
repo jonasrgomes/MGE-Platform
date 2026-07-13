@@ -4,6 +4,7 @@
  */
 #pragma once
 #include <cstdint>
+#include "mge/ber/ber_constructed.h"
 #include "mge/ber/ber_length.h"
 #include "mge/ber/ber_string_types.h"
 #include "mge/ber/ber_tag.h"
@@ -30,6 +31,14 @@ public:
     static core::Result decodeVisibleString(const TlvView& tlv, core::BufferView& value);
     static core::Result decodeUtf8String(const TlvView& tlv, core::BufferView& value);
     static core::Result decodeBitString(const TlvView& tlv, BitStringView& value);
+
+    static core::Result decodeConstructed(const TlvView& tlv,
+                                          const Tag& expectedTag,
+                                          core::BufferView& content);
+    static core::Result decodeObjectIdentifier(const TlvView& tlv,
+                                               std::uint32_t* arcs,
+                                               core::usize capacity,
+                                               core::usize& arcCount);
 
 private:
     static core::Result decodeSignedIntegerValue(const core::BufferView& bytes,

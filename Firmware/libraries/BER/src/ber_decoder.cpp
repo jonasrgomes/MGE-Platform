@@ -275,3 +275,76 @@ core::Result Decoder::decodeBitString(const TlvView& tlv,
 
 } // namespace ber
 } // namespace mge
+
+namespace mge { namespace ber {
+
+core::Result Decoder::decodeConstructed(
+    const TlvView& tlv,
+    const Tag& expectedTag,
+    core::BufferView& content)
+{
+    if (tlv.tag != expectedTag) return core::Error::InvalidTag;
+    if (tlv.tag.pc != PcBit::Constructed) return core::Error::InvalidType;
+    content = tlv.value;
+    return core::Error::Ok;
+}
+
+core::Result Decoder::decodeObjectIdentifier(
+    const TlvView& tlv,
+    std::uint32_t* arcs,
+    core::usize capacity,
+    core::usize& arcCount)
+{
+    arcCount = 0;
+    if (tlv.tag != UniversalTag::ObjectIdentifier)
+        return core::Error::InvalidTag;
+    if (arcs == nullptr) return core::Error::InvalidPointer;
+    if (capacity < 2) return core::Error::BufferOverflow;
+    if (tlv.value.empty()) return core::Error::InvalidLength;
+
+    std::uint32_t subids[32]{};
+    core::usize subCount = 0;
+    std::uint32_t current = 0;
+    bool continuation = false;
+
+    for (core::usize i = 0; i < tlv.value.size(); ++i)
+    {
+        const core::u8 byte = tlv.value[i];
+        if (current > (0xFFFFFFFFU >> 7)) return core::Error::InvalidValue;
+        current = (current << 7) | static_cast<std::uint32_t>(byte & 0x7FU);
+        continuation = (byte & 0x80U) != 0;
+        if (!continuation)
+        {
+            if (subCount >= 32) return core::Error::BufferOverflow;
+            subids[subCount++] = current;
+            current = 0;
+        }
+    }
+
+    if (continuation || subCount == 0) return core::Error::DecodeError;
+
+    const std::uint32_t first = subids[0];
+    if (first < 40)
+    {
+        arcs[0] = 0; arcs[1] = first;
+    }
+    else if (first < 80)
+    {
+        arcs[0] = 1; arcs[1] = first - 40;
+    }
+    else
+    {
+        arcs[0] = 2; arcs[1] = first - 80;
+    }
+    arcCount = 2;
+
+    for (core::usize i = 1; i < subCount; ++i)
+    {
+        if (arcCount >= capacity) return core::Error::BufferOverflow;
+        arcs[arcCount++] = subids[i];
+    }
+
+    return core::Error::Ok;
+}
+
+}} // namespace mge::ber

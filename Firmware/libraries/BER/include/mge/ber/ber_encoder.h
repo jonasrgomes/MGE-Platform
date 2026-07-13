@@ -4,6 +4,7 @@
  */
 #pragma once
 #include <cstdint>
+#include "mge/ber/ber_constructed.h"
 #include "mge/ber/ber_length.h"
 #include "mge/ber/ber_tag.h"
 
@@ -29,6 +30,16 @@ public:
     core::Result writeUtf8String(const char* text, core::usize length);
     core::Result writeUtf8String(const char* nullTerminatedText);
     core::Result writeBitString(const void* data, core::usize bitCount);
+
+    core::Result writeConstructed(const Tag& tag,
+                                  const core::BufferView& encodedContent);
+    core::Result writeSequence(const core::BufferView& encodedContent);
+    core::Result writeSet(const core::BufferView& encodedContent);
+    core::Result writeContextSpecific(std::uint32_t number,
+                                      PcBit pc,
+                                      const core::BufferView& content);
+    core::Result writeObjectIdentifier(const std::uint32_t* arcs,
+                                       core::usize arcCount);
 
 private:
     core::Result writeSignedInteger(const Tag& tag, std::int64_t value);
