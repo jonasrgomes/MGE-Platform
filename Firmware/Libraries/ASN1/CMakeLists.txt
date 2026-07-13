@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(MGE-ASN1 VERSION 0.5.1 LANGUAGES CXX)
+project(MGE-ASN1 VERSION 0.5.2 LANGUAGES CXX)
 
 add_library(mge-asn1 STATIC
     src/asn1_encoder.cpp
@@ -29,3 +29,11 @@ target_link_libraries(asn1_foundation_example PRIVATE mge-asn1)
 
 enable_testing()
 add_test(NAME asn1_foundation_test COMMAND asn1_foundation_test)
+
+add_executable(asn1_dataset_test tests/asn1_dataset_test.cpp)
+target_link_libraries(asn1_dataset_test PRIVATE mge-asn1)
+
+add_executable(asn1_dataset_example examples/asn1_dataset_example.cpp)
+target_link_libraries(asn1_dataset_example PRIVATE mge-asn1)
+
+add_test(NAME asn1_dataset_test COMMAND asn1_dataset_test)
